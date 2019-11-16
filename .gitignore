@@ -1,0 +1,6 @@
+.venv
+.env
+.vscode
+run.sh
+__pycache__
+instance
