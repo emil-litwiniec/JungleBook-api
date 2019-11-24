@@ -2,5 +2,6 @@
 .env
 .vscode
 run.sh
-__pycache__
 instance
+__pycache__
+*.pyc

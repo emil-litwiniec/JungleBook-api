@@ -1,6 +1,6 @@
 import jwt
 from datetime import datetime
-from dateutil.relativedelta import *
+from dateutil.relativedelta import relativedelta
 
 algorithm = "HS256"
 key = "secret"
