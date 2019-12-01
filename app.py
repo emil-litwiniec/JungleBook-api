@@ -3,6 +3,7 @@ from os import environ
 from dotenv import load_dotenv
 from flask import Flask
 from jungle_book.auth.views import auth_bp, oauth
+from jungle_book.book.views import book_bp
 from config import ProductionConfig, DevelopmentConfig
 
 dotenv_path = join(dirname(__file__), '.env')  # Path to .env file
@@ -28,7 +29,8 @@ def create_app(test_config=None):
 def setup_app(app):
     """Create tables if they do not exist already"""
     oauth.init_app(app)
-    app.register_blueprint(auth_bp, url_prefix="")
+    app.register_blueprint(auth_bp, url_prefix="/api/")
+    app.register_blueprint(book_bp, url_prefix="/api/")
 
 
 app = create_app()

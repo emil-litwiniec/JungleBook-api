@@ -44,8 +44,6 @@ def authorize_signup():
 
     # ------------------------------------ #
 
-    # print(request.json['email'])
-
     try:
         results = User.query.filter_by(email=token_email).first()
         if not results:
@@ -64,11 +62,10 @@ def authorize_signup():
     except Exception as e:
         print(e)
         return abort(500, "Something wrong with the query")
-        # return "Something wrong with the query"
+
 
     id_results = User.query.filter_by(email=token_email).first()
 
-    # print(id_results.id)
     payload = {
         "id": id_results.id,
         "first_name": id_results.first_name,

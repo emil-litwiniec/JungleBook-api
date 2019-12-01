@@ -3,7 +3,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 algorithm = "HS256"
-key = "secret"
+key = "secret"  # TODO put this into env variables
 NOW = datetime.now()
 SIX_MONTHS_LATER = NOW + relativedelta(months=+6)
 
