@@ -13,5 +13,19 @@ class Book(db.Model):
 
     plants = db.relationship('Plant', backref="book", lazy=True)
 
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'user_id': self.user_id,
+            'guest_user_id': self.guest_user_id,
+            'created_at': self.created_at,
+            'last_update': self.last_update,
+            'avatar_image': self.avatar_image,
+            'plants': self.plants
+        }
+
     def __repr__(self):
         return '<Book %r>' % self.id

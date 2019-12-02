@@ -13,5 +13,19 @@ class User(db.Model):
 
     books = db.relationship('Book', backref="User", lazy=True)
 
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'email': self.email,
+            'created_at': self.created_at,
+            'last_update': self.last_update,
+            'settings': self.settings,
+            'avatar_image': self.avatar_image,
+            'books': self.books
+        }
+
     def __repr__(self):
         return '<User %r>' % self.email

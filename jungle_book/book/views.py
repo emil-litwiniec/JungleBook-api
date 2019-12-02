@@ -5,25 +5,18 @@ from jungle_book.db import db
 from jungle_book.user.models import User
 from jungle_book.book.models import Book
 
-
-def updateQueryObject(query, data, exceptions):
-    for (k, v) in data.items():
-        if k in exceptions:
-            continue
-        query.__setattr__(k, v)
-    return query
+from jungle_book.utils import update_query_object
 
 
-no_such = 'No such user or book'
-
+no_such = 'No such user or Book'
 
 book_bp = Blueprint('book_bp', __name__)
 
 
 @book_bp.route("/book", methods=['POST'])
 def create_book():
-    """
-    Creates new book in database.
+    """Creates new book in database.
+
     request body args: user_id, avatar_image, name, description
     """
 
@@ -60,10 +53,11 @@ def create_book():
     return make_response(jsonify(data), 200)
 
 
+# TODO rethink query params structure
 @book_bp.route("/book/<int:user_id>,<int:book_id>", methods=['DELETE'])
 def delete_book(user_id, book_id):
-    """
-    Deletes existing book in database.
+    """Deletes existing book in database.
+
     url query params: book_id, user_id
     """
 
@@ -89,8 +83,8 @@ def delete_book(user_id, book_id):
 
 @book_bp.route("/book", methods=['PUT'])
 def update_book():
-    """
-    Updates existing book in database.
+    """Updates existing book in database.
+
     request body args: book_id, user_id, name, description, avatar_image
     """
 
@@ -105,7 +99,7 @@ def update_book():
             return abort(400, no_such)
         else:
             exceptions = ['user_id', 'book_id']
-            updated_query = updateQueryObject(
+            updated_query = update_query_object(
                 result, json_data, exceptions
             )
 
@@ -114,11 +108,38 @@ def update_book():
 
     except Exception as e:
         print(e)
-        return abort(500, "Unable to update a book")
+        return abort(500, "Unable to update a Book")
 
-    data = {
+    res_data = jsonify({
         'message': 'Book updated',
         'success': True
-    }
+    })
 
-    return make_response(jsonify(data), 200)
+    return make_response(res_data, 200)
+
+
+@book_bp.route('/book/<book_id>', methods=['GET'])
+def get_book(book_id):
+    """
+    Returns JSON with specific Book data
+
+    :param (int): book_id
+    """
+
+    try:
+        result = Book.query.filter_by(id=book_id).first()
+        if not result:
+            return abort(400, no_such)
+        else:
+            query_data = result.serialize
+
+    except Exception as e:
+        print(e)
+        return abort(400, no_such)
+
+    res_data = jsonify({
+        'data': query_data,
+        'success': True
+    })
+
+    return make_response(res_data, 200)

@@ -9,5 +9,14 @@ class Encyclopedia(db.Model):
 
     plants = db.relationship('Plant', backref="encyclopedia", lazy=True)
 
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'common_name': self.common_name,
+            'description': self.description,
+            'info': self.info
+        }
+
     def __repr__(self):
         return '<Encyclopedia %r>' % self.id
