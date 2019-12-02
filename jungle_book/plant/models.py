@@ -13,6 +13,21 @@ class Plant(db.Model):
     stats = db.Column(db.JSON)
 
     moments = db.relationship('Moment', backref="plant", lazy=True)
+
+    @property
+    def serialze(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'book_id': self.book_id,
+            'encyclopedia_id': self.encyclopedia_id,
+            'last_watering': self.last_watering,
+            'waterings': self.waterings,
+            'last_dew': self.last_dew,
+            'dews': self.dews,
+            'stats': self.stats,
+            'moments': self.moments
+        }
     
     def __repr__(self):
         return '<Plant %r>' % self.id

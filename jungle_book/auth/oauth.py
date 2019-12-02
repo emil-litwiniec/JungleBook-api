@@ -1,6 +1,6 @@
 from authlib.flask.client import OAuth
 
-
+# TODO put sensitive data into env variable
 oauth = OAuth()
 oauth.register(
     name="google",
