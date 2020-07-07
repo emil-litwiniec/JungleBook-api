@@ -19,7 +19,7 @@ def encode_jwt(payload):
         payload=payload,
         key=key,
         algorithm=algorithm
-        )
+    )
     return token
 
 
@@ -38,7 +38,7 @@ def validate_jwt(token):
         jwt.decode(jwt=token, key=key)
     except jwt.ExpiredSignatureError:
         return False
-    
+
     return True
 
 
@@ -51,5 +51,3 @@ def extend_jwt(token):
         return new_token
     else:
         return "Provided token is invalid."
-
-

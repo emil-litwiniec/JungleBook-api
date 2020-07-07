@@ -1,11 +1,13 @@
 from flask import (Blueprint, url_for,
-                   redirect, request, jsonify, Response, abort)
+                   request, jsonify)
 # from google.auth import jwt as google_jwt  # required for production
 from datetime import datetime
 from jungle_book.user.models import User
 from jungle_book.db import db
 from .jwt import encode_jwt, extend_jwt
 from .oauth import oauth
+
+from jungle_book.errors import ErrorHandler
 
 
 auth_bp = Blueprint('auth_bp', __name__)
@@ -30,10 +32,12 @@ def extend_token():
 
 @auth_bp.route('/authorize-signup', methods=["GET", "POST"])
 def authorize_signup():
-    token_first_name = request.json['given_name']
-    token_last_name = request.json['family_name']
-    token_email = request.json['email']
-
+    try:
+        token_first_name = request.json['given_name']
+        token_last_name = request.json['family_name']
+        token_email = request.json['email']
+    except Exception:
+        return ErrorHandler.provide_parameters()
     # --- these will run in prodcution --- #
 
     # token = oauth.google.authorize_access_token()
@@ -60,9 +64,7 @@ def authorize_signup():
         else:
             print(f'Welcome back {results.first_name}!')
     except Exception as e:
-        print(e)
-        return abort(500, "Something wrong with the query")
-
+        return ErrorHandler.abort(500, "An error occured during authorization", e)
 
     id_results = User.query.filter_by(email=token_email).first()
 

@@ -1,21 +1,19 @@
-from flask import Blueprint, request, abort, make_response, jsonify
+from flask import Blueprint, request, make_response, jsonify
 from datetime import datetime
 
 from jungle_book.db import db
 from jungle_book.user.models import User
 from jungle_book.book.models import Book
-
+from jungle_book.errors import error_book, error_user
 from jungle_book.utils import update_query_object
 
-
-no_such = 'No such user or Book'
 
 book_bp = Blueprint('book_bp', __name__)
 
 
 @book_bp.route("/book", methods=['POST'])
 def create_book():
-    """Creates new book in database.
+    """Creates new book in db.
 
     request body args: user_id, avatar_image, name, description
     """
@@ -28,7 +26,7 @@ def create_book():
     try:
         results = User.query.filter_by(id=user_id).first()
         if not results:
-            return abort(400, "User doesn't exist")
+            return error_user.not_exists()
         else:
             new_book = Book(
                 user_id=user_id,
@@ -42,8 +40,7 @@ def create_book():
             db.session.commit()
 
     except Exception as e:
-        print(e)
-        return abort(500, "Unable to create new book")
+        return error_book.unable_to_create(e)
 
     data = {
         'message': 'New Book created',
@@ -56,7 +53,7 @@ def create_book():
 # TODO rethink query params structure
 @book_bp.route("/book/<int:user_id>,<int:book_id>", methods=['DELETE'])
 def delete_book(user_id, book_id):
-    """Deletes existing book in database.
+    """Deletes existing Book from database.
 
     url query params: book_id, user_id
     """
@@ -64,14 +61,13 @@ def delete_book(user_id, book_id):
     try:
         result = Book.query.filter_by(user_id=user_id, id=book_id).first()
         if not result:
-            return abort(400, no_such)
+            return error_book.not_exists()
         else:
             db.session.delete(result)
             db.session.commit()
 
     except Exception as e:
-        print(e)
-        return abort(500, "Unable to delete a book")
+        return error_book.unable_to_delete(e)
 
     data = {
         'message': 'Book deleted',
@@ -96,7 +92,7 @@ def update_book():
     try:
         result = Book.query.filter_by(user_id=user_id, id=book_id).first()
         if not result:
-            return abort(400, no_such)
+            return error_book.not_exists()
         else:
             exceptions = ['user_id', 'book_id']
             updated_query = update_query_object(
@@ -107,8 +103,7 @@ def update_book():
         db.session.commit()
 
     except Exception as e:
-        print(e)
-        return abort(500, "Unable to update a Book")
+        return error_book.unable_to_update(e)
 
     res_data = jsonify({
         'message': 'Book updated',
@@ -129,13 +124,12 @@ def get_book(book_id):
     try:
         result = Book.query.filter_by(id=book_id).first()
         if not result:
-            return abort(400, no_such)
+            return error_book.not_exists()
         else:
             query_data = result.serialize
 
     except Exception as e:
-        print(e)
-        return abort(400, no_such)
+        return error_book.not_exists(e)
 
     res_data = jsonify({
         'data': query_data,

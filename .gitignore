@@ -1,7 +1,9 @@
 .venv
 .env
+.flaskenv
 .vscode
 run.sh
 instance
 __pycache__
 *.pyc
+static/files/*

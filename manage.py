@@ -25,7 +25,7 @@ def drop_all_tables():
 @manager.command
 def create_all_tables():
     if prompt_bool(
-                "Are you sure you want to create all tables?"):
+            "Are you sure you want to create all tables?"):
         try:
             db.create_all()
         except Exception as e:

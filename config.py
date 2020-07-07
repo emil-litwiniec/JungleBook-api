@@ -12,8 +12,9 @@ class Config(object):
     CSRF_ENABLED = True
     SECRET_KEY = "key"
     SQLALCHEMY_DATABASE_URI = os.environ["DATABASE_URL"]
-    GOOGLE_CLIENT_ID = "810979674149-i58pjaopuunstb60n6j645nhb9mvk66e.apps.googleusercontent.com"
-    GOOGLE_CLIENT_SECRET = "DVVkppPgpEFDX5S7naVvLGjA"
+    GOOGLE_CLIENT_ID = os.environ["GOOGLE_CLIENT_ID"]
+    GOOGLE_CLIENT_SECRET = os.environ["GOOGLE_CLIENT_SECRET"]
+    TREFLE_API_KEY = os.environ["TREFLE_API_KEY"]
 
 
 class ProductionConfig(Config):

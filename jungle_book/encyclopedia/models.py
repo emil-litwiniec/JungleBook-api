@@ -6,6 +6,7 @@ class Encyclopedia(db.Model):
     common_name = db.Column(db.String(50), unique=True, nullable=False)
     description = db.Column(db.Text)
     info = db.Column(db.JSON)
+    validated = db.Column(db.Boolean, default=False)
 
     plants = db.relationship('Plant', backref="encyclopedia", lazy=True)
 
@@ -15,7 +16,8 @@ class Encyclopedia(db.Model):
             'id': self.id,
             'common_name': self.common_name,
             'description': self.description,
-            'info': self.info
+            'info': self.info,
+            'validated': self.validated
         }
 
     def __repr__(self):
