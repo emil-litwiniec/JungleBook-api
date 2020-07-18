@@ -1,6 +1,6 @@
 from flask import (Blueprint, url_for,
-                   request, jsonify)
-# from google.auth import jwt as google_jwt  # required for production
+                   request, redirect, jsonify)
+from google.auth import jwt as google_jwt  # required for production
 from datetime import datetime
 from jungle_book.user.models import User
 from jungle_book.db import db
@@ -21,6 +21,7 @@ def index():
 @auth_bp.route('/login', methods=["GET"])
 def login():
     redirect_uri = url_for('auth_bp.authorize_signup', _external=True)
+    print('redirect uri: ', redirect_uri)
     return oauth.google.authorize_redirect(redirect_uri)
 
 
@@ -32,19 +33,19 @@ def extend_token():
 
 @auth_bp.route('/authorize-signup', methods=["GET", "POST"])
 def authorize_signup():
-    try:
-        token_first_name = request.json['given_name']
-        token_last_name = request.json['family_name']
-        token_email = request.json['email']
-    except Exception:
-        return ErrorHandler.provide_parameters()
+    # try:
+    #     token_first_name = request.json['given_name']
+    #     token_last_name = request.json['family_name']
+    #     token_email = request.json['email']
+    # except Exception:
+    #     return ErrorHandler.provide_parameters()
     # --- these will run in prodcution --- #
 
-    # token = oauth.google.authorize_access_token()
-    # data_token = google_jwt.decode(token['id_token'], verify=False)
-    # token_email = data_token['email']
-    # token_first_name = data_token['given_name']
-    # token_last_name = data_token['family_name']
+    token = oauth.google.authorize_access_token()
+    data_token = google_jwt.decode(token['id_token'], verify=False)
+    token_email = data_token['email']
+    token_first_name = data_token['given_name']
+    token_last_name = data_token['family_name']
 
     # ------------------------------------ #
 
@@ -77,8 +78,7 @@ def authorize_signup():
 
     new_token = encode_jwt(payload=payload)
     response = jsonify({'access-token': str(new_token)})
-
-    return response
+    return redirect('https://www.wp.pl/something')
 
 # @auth_bp.route("/validate-token", methods=["POST"])
 # def validate_token():

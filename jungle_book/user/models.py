@@ -1,5 +1,7 @@
 from jungle_book.db import db
+from sqlalchemy.ext.hybrid import hybrid_property
 
+from . import bcrypt
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
@@ -11,8 +13,22 @@ class User(db.Model):
     settings = db.Column(db.JSON)
     # TODO -> set path to default avatar picture
     avatar_image = db.Column(db.String())
+    _password = db.Column(db.String(128))
 
     books = db.relationship('Book', backref="User", lazy=True)
+
+    plants = db.relationship('Book', backref="Plant", lazy=True)
+
+    @hybrid_property
+    def password(self):
+        return self._password
+
+    @password.setter
+    def password(self, text_password):
+        self._password = bcrypt.generate_password_hash(text_password)
+
+    def validate_password(self, text_password):
+        return bcrypt.check_password_hash(self._password, text_password)
 
     @property
     def serialize(self):
@@ -25,7 +41,8 @@ class User(db.Model):
             'last_update': self.last_update,
             'settings': self.settings,
             'avatar_image': self.avatar_image,
-            'books': self.books
+            'books': self.books,
+            'plants': self.plants
         }
 
     def __repr__(self):

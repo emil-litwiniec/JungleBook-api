@@ -11,7 +11,7 @@ from jungle_book.utils import update_query_object
 from werkzeug.utils import secure_filename
 from enum import Enum
 from jungle_book.fs.fs_manager import FileSystemManager
-from flask_cors import
+# from flask_cors import flask_cors
 
 remove_file = FileSystemManager.remove
 files_bp = Blueprint('files_bp', __name__)

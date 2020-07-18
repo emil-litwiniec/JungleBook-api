@@ -1,10 +1,13 @@
 from jungle_book.db import db
 from app import app
 from flask_script import Manager, prompt_bool
+from flask_migrate import Migrate, MigrateCommand
 
 db.init_app(app)
 manager = Manager(app)
+migrate = Migrate(app, db)
 
+manager.add_command('db', MigrateCommand)
 
 @app.before_first_request
 def create_db():

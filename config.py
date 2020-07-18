@@ -15,6 +15,7 @@ class Config(object):
     GOOGLE_CLIENT_ID = os.environ["GOOGLE_CLIENT_ID"]
     GOOGLE_CLIENT_SECRET = os.environ["GOOGLE_CLIENT_SECRET"]
     TREFLE_API_KEY = os.environ["TREFLE_API_KEY"]
+    BCRYPT_LOG_ROUNDS = 12
 
 
 class ProductionConfig(Config):
