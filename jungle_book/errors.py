@@ -1,5 +1,5 @@
 from flask import abort
-
+import traceback
 
 class ErrorHandler:
     # TODO: add docstrings
@@ -13,7 +13,7 @@ class ErrorHandler:
     @staticmethod
     def abort(code, msg, e=None):
         if e is not None:
-            print(e)
+            traceback.print_tb(e.__traceback__)
         return abort(code, msg)
 
     @staticmethod
@@ -26,25 +26,25 @@ class ErrorHandler:
 
     def not_exists(self, e=None, code=400):
         if e is not None:
-            print(e)
+            traceback.print_tb(e.__traceback__)
         msg = f"{self.subject} doesn't exist"
         return abort(code, msg)
 
     def unable_to_update(self, e=None, code=500):
         if e is not None:
-            print(e)
+            traceback.print_tb(e.__traceback__)
         msg = f"Unable to update {self.subject}"
         return abort(code, msg)
 
     def unable_to_create(self, e=None, code=500):
         if e is not None:
-            print(e)
+            traceback.print_tb(e.__traceback__)
         msg = f"Unable to create new {self.subject}"
         return abort(code, msg)
 
     def unable_to_delete(self, e=None, code=500):
         if e is not None:
-            print(e)
+            traceback.print_tb(e.__traceback__)
         msg = f"Unable to delete {self.subject}"
         return abort(code, msg)
 
