@@ -66,7 +66,7 @@ def authorize_google():
 
     new_token = encode_jwt(payload=payload)
     response = jsonify({'access-token': str(new_token)})
-    return redirect(os.environ['REDIRECT_URI']
+    return redirect(os.environ['REDIRECT_URI'])
 
 
 @auth_bp.route('/sign-up', methods=['POST'])
