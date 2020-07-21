@@ -1,5 +1,4 @@
 from os.path import join, dirname
-from os import environ
 from dotenv import load_dotenv
 from flask import Flask
 from jungle_book.auth.views import auth_bp, oauth

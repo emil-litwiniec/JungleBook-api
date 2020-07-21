@@ -1,6 +1,9 @@
 import jwt
+from flask import request, jsonify
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from functools import wraps
+from jungle_book.user.models import User
 
 algorithm = "HS256"
 key = "secret"  # TODO put this into env variables
@@ -19,15 +22,13 @@ def encode_jwt(payload):
         payload=payload,
         key=key,
         algorithm=algorithm
-    )
+    ).decode('utf-8')
     return token
 
 
 def decode_jwt(token):
     """Decode JWT token"""
-
     decoded_token = jwt.decode(jwt=token, key=key)
-
     return decoded_token
 
 
@@ -51,3 +52,25 @@ def extend_jwt(token):
         return new_token
     else:
         return "Provided token is invalid."
+
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+        
+        if not token:
+            return jsonify({'message': 'Token is missing'}), 401
+        
+        try:
+            data = decode_jwt(token)
+            user = User.query.filter_by(id=data['id']).first()
+        except jwt.exceptions.DecodeError:
+            return jsonify({'message': 'Token is invalid!'}), 401
+
+        return f(user, *args, **kwargs)
+    
+    return decorated
