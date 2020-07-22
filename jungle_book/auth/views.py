@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-from flask import Blueprint, jsonify, make_response, redirect, request, url_for
+from flask import Blueprint, jsonify, make_response, redirect, request, url_for, abort, Response
 from google.auth import jwt as google_jwt  # required for production
 from jungle_book.db import db
 from jungle_book.errors import ErrorHandler, error_user
@@ -14,13 +14,13 @@ auth_bp = Blueprint('auth_bp', __name__)
 
 
 @auth_bp.route('/sign-in-with-google', methods=["GET"])
-def login():
+def login( ):
     redirect_uri = url_for('auth_bp.authorize_google', _external=True)
     return oauth.google.authorize_redirect(redirect_uri)
 
 
 @auth_bp.route('/authorize', methods=["GET", "POST"])
-def authorize_google():
+def authorize_google( ):
     # try:
     #     token_first_name = request.json['given_name']
     #     token_last_name = request.json['family_name']
@@ -70,7 +70,7 @@ def authorize_google():
 
 
 @auth_bp.route('/sign-up', methods=['POST'])
-def sign_up():
+def sign_up( ):
     json_data = request.get_json()
     try:
         email = json_data['email']
@@ -111,41 +111,36 @@ def sign_up():
 
 
 @auth_bp.route('/sign-in', methods=['POST'])
-def sign_in():
+def sign_in( ):
     json_data = request.get_json()
-    try: 
+    try:
         email = json_data['email']
         password = json_data['password']
     except Exception as e:
         return error_user.provide_parameters()
 
-    try:
-        user = User.query.filter_by(email=email).first()
-        if not user:
-            return ErrorHandler.abort(400, 'No such user')
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return {"message": "No such user"}, 400
+
+    else:
+        if user.validate_password(password):
+            payload = {
+                "id": user.id,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "email": user.email
+            }
+
+            new_token = encode_jwt(payload=payload)
+            response = jsonify({'access-token': str(new_token)})
+
+            return make_response(response, 200)
         else:
-            if user.validate_password(password):
-                print('validate_password 1')
-                payload = {
-                        "id": user.id,
-                        "first_name": user.first_name,
-                        "last_name": user.last_name,
-                        "email": user.email
-                    }
-                
-                new_token = encode_jwt(payload=payload)
-                response = jsonify({'access-token': str(new_token)})
-
-                return make_response(response, 200)
-            else:
-                return ErrorHandler.abort(400, "Email or password are incorrect")
-
-                
-    except Exception as e:
-        return error_user.unable_to_create(e)
+            return {"message": "Email or password are incorrect"}, 400
 
 
 @auth_bp.route('/token/extend', methods=["PUT"])
-def extend_token():
+def extend_token( ):
     token = request.json['token']
     return extend_jwt(token=token)

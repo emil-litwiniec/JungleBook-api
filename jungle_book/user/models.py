@@ -3,6 +3,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from . import bcrypt
 
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     first_name = db.Column(db.String(40))
@@ -28,6 +29,8 @@ class User(db.Model):
         self._password = bcrypt.generate_password_hash(text_password).decode('utf-8')
 
     def validate_password(self, text_password):
+        if not self._password:
+            return False
         return bcrypt.check_password_hash(self._password, text_password)
 
     @property

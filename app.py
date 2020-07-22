@@ -43,6 +43,7 @@ def setup_app(app):
     app.register_blueprint(encyclopedia_bp, url_prefix=url_prefix)
     app.register_blueprint(plant_bp, url_prefix=url_prefix)
     app.register_blueprint(files_bp, url_prefix=url_prefix)
+    CORS(app)
 
 
 app = create_app()
