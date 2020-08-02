@@ -1,5 +1,6 @@
 from flask import Blueprint, request, make_response, jsonify
 from datetime import datetime
+from jungle_book.auth.jwt import token_required
 
 from jungle_book.db import db
 from jungle_book.user.models import User
@@ -12,24 +13,24 @@ book_bp = Blueprint('book_bp', __name__)
 
 
 @book_bp.route("/book", methods=['POST'])
-def create_book():
+@token_required
+def create_book(user):
     """Creates new book in db.
 
     request body args: user_id, avatar_image, name, description
     """
 
-    user_id = request.json['user_id']
     name = request.json['name']
     description = request.json['description']
     avatar_image = request.json['avatar_image']
 
+
     try:
-        results = User.query.filter_by(id=user_id).first()
-        if not results:
+        if not user:
             return error_user.not_exists()
         else:
             new_book = Book(
-                user_id=user_id,
+                user_id=user.id,
                 created_at=datetime.now(),
                 last_update=datetime.now(),
                 avatar_image=avatar_image,
@@ -51,15 +52,16 @@ def create_book():
 
 
 # TODO rethink query params structure
-@book_bp.route("/book/<int:user_id>,<int:book_id>", methods=['DELETE'])
-def delete_book(user_id, book_id):
+@book_bp.route("/book/<int:book_id>", methods=['DELETE'])
+@token_required
+def delete_book(user, book_id):
     """Deletes existing Book from database.
 
     url query params: book_id, user_id
     """
 
     try:
-        result = Book.query.filter_by(user_id=user_id, id=book_id).first()
+        result = Book.query.filter_by(user_id=user.user_id, id=book_id).first()
         if not result:
             return error_book.not_exists()
         else:
@@ -78,14 +80,15 @@ def delete_book(user_id, book_id):
 
 
 @book_bp.route("/book", methods=['PUT'])
-def update_book():
+@token_required
+def update_book(user):
     """Updates existing book in database.
 
     request body args: book_id, user_id, name, description, avatar_image
     """
 
     json_data = request.get_json()
-    user_id = json_data['user_id']
+    user_id = user.id
     book_id = json_data['book_id']
     json_data['last_update'] = datetime.now()
 

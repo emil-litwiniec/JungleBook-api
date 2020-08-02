@@ -1,6 +1,5 @@
 from jungle_book.db import db
 from sqlalchemy.ext.hybrid import hybrid_property
-
 from . import bcrypt
 
 
@@ -44,8 +43,8 @@ class User(db.Model):
             'last_update': self.last_update,
             'settings': self.settings,
             'avatar_image': self.avatar_image,
-            'books': self.books,
-            'plants': self.plants
+            'books': [book.serialize for book in self.books],
+            'plants': [plant.serialize for plant in self.plants]
         }
 
     def __repr__(self):

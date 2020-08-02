@@ -3,7 +3,8 @@ from jungle_book.db import db
 
 class Plant(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
-    name = db.Column(db.String(30))
+    name = db.Column(db.String(60))
+    scientific_name = db.Column(db.String(120))
     description = db.Column(db.Text)
     book_id = db.Column(db.Integer, db.ForeignKey('book.id'))
     encyclopedia_id = db.Column(db.Integer, db.ForeignKey('encyclopedia.id'))
@@ -24,6 +25,7 @@ class Plant(db.Model):
         return {
             'id': self.id,
             'name': self.name,
+            'scientific_name': self.scientific_name,
             'description': self.description,
             'book_id': self.book_id,
             'encyclopedia_id': self.encyclopedia_id,

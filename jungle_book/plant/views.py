@@ -117,23 +117,24 @@ def update_watering():
     json_data = request.get_json()
     plant_id = json_data['plant_id']
     json_data['last_update'] = datetime.now()
-    json_data['last_watering'] = datetime.now()
+    json_data['last_watering'] = datetime.now().isoformat()
+
 
     try:
         result = Plant.query.filter_by(id=plant_id).first()
         if not result:
             return error_plant.not_exists()
         else:
-            current_timestamp = datetime.timestamp(json_data['last_watering'])
+            current_time = json_data['last_watering']
             if result.waterings is None:
                 json_data['waterings'] = json.dumps({
                     'waterings': [
-                        current_timestamp
+                        current_time
                     ]
                 })
             else:
                 waterings = json.loads(result.waterings)
-                waterings['waterings'].append(current_timestamp)
+                waterings['waterings'].append(current_time)
                 json_data['waterings'] = json.dumps(waterings)
 
             exceptions = ['id', 'book_id']
@@ -166,7 +167,7 @@ def update_dew():
 
     json_data = request.get_json()
     plant_id = json_data['plant_id']
-    json_data['last_update'] = datetime.now()
+    json_data['last_update'] = datetime.now().isoformat()
     json_data['last_dew'] = datetime.now()
 
     try:
@@ -174,16 +175,16 @@ def update_dew():
         if not result:
             return error_plant.not_exists()
         else:
-            current_timestamp = datetime.timestamp(json_data['last_dew'])
+            current_time = datetime.timestamp(json_data['last_dew'])
             if result.dews is None:
                 json_data['dews'] = json.dumps({
                     'dews': [
-                        current_timestamp
+                        current_time
                     ]
                 })
             else:
                 dews = json.loads(result.dews)
-                dews['dews'].append(current_timestamp)
+                dews['dews'].append(current_time)
                 json_data['dews'] = json.dumps(dews)
 
             exceptions = ['id', 'book_id']

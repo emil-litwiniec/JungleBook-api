@@ -81,7 +81,7 @@ def sign_up( ):
     try:
         result = User.query.filter_by(email=email).first()
         if result:
-            return ErrorHandler.abort(400, 'Email already in use')
+            return {"message": "Email already in use"}, 400
         else:
             new_user = User(
                 first_name='',
@@ -105,7 +105,8 @@ def sign_up( ):
     }
 
     new_token = encode_jwt(payload=payload)
-    response = jsonify({'access-token': str(new_token)})
+    response = jsonify({'access-token': str(new_token),
+                        'data': new_user.serialize})
 
     return make_response(response, 200)
 
@@ -133,7 +134,8 @@ def sign_in( ):
             }
 
             new_token = encode_jwt(payload=payload)
-            response = jsonify({'access-token': str(new_token)})
+            response = jsonify({'access-token': str(new_token),
+                                'data': user.serialize})
 
             return make_response(response, 200)
         else:

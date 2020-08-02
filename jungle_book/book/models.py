@@ -9,7 +9,7 @@ class Book(db.Model):
     guest_user_id = db.Column(db.Integer, nullable=True)
     created_at = db.Column(db.DateTime(timezone=False))
     last_update = db.Column(db.DateTime(timezone=False))
-    avatar_image = db.Column(db.String())
+    avatar_image = db.Column(db.String(), nullable=True)
 
     plants = db.relationship('Plant', backref="book", lazy=True)
 
@@ -24,7 +24,7 @@ class Book(db.Model):
             'created_at': self.created_at,
             'last_update': self.last_update,
             'avatar_image': self.avatar_image,
-            'plants': self.plants
+            'plants': [plant.serialize for plant in self.plants]
         }
 
     def __repr__(self):

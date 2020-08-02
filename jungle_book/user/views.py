@@ -16,21 +16,12 @@ from jungle_book.utils import update_query_object
 user_bp = Blueprint('user_bp', __name__)
 
 
-@user_bp.route('/user/<int:user_id>', methods=["GET"])
+@user_bp.route('/user', methods=["GET"])
 @token_required
-def get_user_data(user, user_id):
-    res_data = ''
-    try:
-        user = User.query.filter_by(id=user_id).first()
-        if not user:
-            error_user.not_exists()
-        else:
-            query_data = user.serialize
-    except Exception as e:
-        return error_user.not_exists(e)
-    
+def get_user_data(user):
+
     res_data = jsonify({
-        'data': query_data,
+        'data': user.serialize,
         'success': True
     })
 
