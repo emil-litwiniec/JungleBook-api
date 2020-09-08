@@ -39,6 +39,7 @@ def create_plant():
         return error_plant.unable_to_create(e)
 
     data = {
+        'plant_id': new_plant.id,
         'message': 'New Plant created',
         'success': True
     }
