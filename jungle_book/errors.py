@@ -11,7 +11,7 @@ class ErrorHandler:
         self.msg = msg
 
     @staticmethod
-    def abort(code, msg, e=None):
+    def abort(code=400, msg="", e=None):
         if e is not None:
             traceback.print_tb(e.__traceback__)
         abort(status=code, description=msg)

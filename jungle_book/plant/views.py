@@ -7,7 +7,7 @@ from jungle_book.user.models import User
 from jungle_book.plant.models import Plant
 from jungle_book.book.models import Book
 
-from jungle_book.errors import error_plant, error_book
+from jungle_book.errors import error_plant, error_book, ErrorHandler
 
 from jungle_book.utils import update_query_object
 
@@ -108,17 +108,15 @@ def update_plant( ):
     return make_response(res_data, 200)
 
 
-@plant_bp.route("/plant/watering", methods=['PUT'])
-def update_watering( ):
-    """Updates existing Plant's watering in database.
-
-    # request body args: plant_id
-    """
+@plant_bp.route("/plant/<action>", methods=['PUT'])
+def plant_update_action(action):
+    if action not in ['dew', 'watering']:
+        return ErrorHandler.abort()
 
     json_data = request.get_json()
     plant_ids = json_data['plant_ids']
     json_data['last_update'] = datetime.now()
-    json_data['last_watering'] = datetime.now().isoformat()
+    json_data['last_{}'.format(action)] = datetime.now().isoformat()
 
     if not plant_ids:
         return error_plant.provide_parameters()
@@ -129,71 +127,19 @@ def update_watering( ):
             return error_plant.not_exists()
         else:
             for result in results:
-                current_time = json_data['last_watering']
-                if result.waterings is None:
-                    json_data['waterings'] = json.dumps({
-                        'waterings': [
+                current_time = json_data['last_{}'.format(action)]
+                last_action = getattr(result, '{}s'.format(action))
+
+                if last_action is None:
+                    json_data['{}s'.format(action)] = json.dumps({
+                        ['{}s'.format(action)]: [
                             current_time
                         ]
                     })
                 else:
-                    waterings = json.loads(result.waterings)
-                    waterings['waterings'].append(current_time)
-                    json_data['waterings'] = json.dumps(waterings)
-
-                exceptions = ['id', 'book_id']
-                updated_query = update_query_object(
-                    result, json_data, exceptions
-                )
-
-                db.session.add(updated_query)
-                db.session.commit()
-
-    except Exception as e:
-        return error_plant.unable_to_update(e)
-
-    res_data = jsonify({
-        'message': 'Plant updated',
-        'success': True
-    })
-
-    return make_response(res_data, 200)
-
-
-@plant_bp.route("/plant/dew", methods=['PUT'])
-def update_dew( ):
-    # TODO: encapsulate dew and watering update views, as they use the same
-    #       logic
-    """Updates existing Plant's dew in database.
-
-    # request body args: plant_id
-    """
-
-    json_data = request.get_json()
-    plant_ids = json_data['plant_ids']
-    json_data['last_update'] = datetime.now()
-    json_data['last_dew'] = datetime.now().isoformat()
-
-    if not plant_ids:
-        return error_plant.provide_parameters()
-
-    try:
-        results = Plant.query.filter(Plant.id.in_(plant_ids)).all()
-        if not results:
-            return error_plant.not_exists()
-        else:
-            for result in results:
-                current_time = json_data['last_dew']
-                if result.dews is None:
-                    json_data['dews'] = json.dumps({
-                        'dews': [
-                            current_time
-                        ]
-                    })
-                else:
-                    dews = json.loads(result.dews)
-                    dews['dews'].append(current_time)
-                    json_data['dews'] = json.dumps(dews)
+                    action_property = json.loads(last_action)
+                    action_property['{}s'.format(action)].append(current_time)
+                    json_data['{}s'.format(action)] = json.dumps(action_property)
 
                 exceptions = ['id', 'book_id']
                 updated_query = update_query_object(
