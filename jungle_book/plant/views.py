@@ -15,7 +15,7 @@ plant_bp = Blueprint('plant_bp', __name__)
 
 
 @plant_bp.route('/plant', methods=['POST'])
-def create_plant():
+def create_plant( ):
     """Creates new Plant in db
     """
 
@@ -74,7 +74,7 @@ def delete_plant(plant_id):
 
 
 @plant_bp.route("/plant", methods=['PUT'])
-def update_plant():
+def update_plant( ):
     """Updates existing Plant in database.
 
     # request body args: plant_id, name, description, avatar_image
@@ -109,42 +109,45 @@ def update_plant():
 
 
 @plant_bp.route("/plant/watering", methods=['PUT'])
-def update_watering():
+def update_watering( ):
     """Updates existing Plant's watering in database.
 
     # request body args: plant_id
     """
 
     json_data = request.get_json()
-    plant_id = json_data['plant_id']
+    plant_ids = json_data['plant_ids']
     json_data['last_update'] = datetime.now()
     json_data['last_watering'] = datetime.now().isoformat()
 
+    if not plant_ids:
+        return error_plant.provide_parameters()
 
     try:
-        result = Plant.query.filter_by(id=plant_id).first()
-        if not result:
+        results = Plant.query.filter(Plant.id.in_(plant_ids)).all()
+        if not results:
             return error_plant.not_exists()
         else:
-            current_time = json_data['last_watering']
-            if result.waterings is None:
-                json_data['waterings'] = json.dumps({
-                    'waterings': [
-                        current_time
-                    ]
-                })
-            else:
-                waterings = json.loads(result.waterings)
-                waterings['waterings'].append(current_time)
-                json_data['waterings'] = json.dumps(waterings)
+            for result in results:
+                current_time = json_data['last_watering']
+                if result.waterings is None:
+                    json_data['waterings'] = json.dumps({
+                        'waterings': [
+                            current_time
+                        ]
+                    })
+                else:
+                    waterings = json.loads(result.waterings)
+                    waterings['waterings'].append(current_time)
+                    json_data['waterings'] = json.dumps(waterings)
 
-            exceptions = ['id', 'book_id']
-            updated_query = update_query_object(
-                result, json_data, exceptions
-            )
+                exceptions = ['id', 'book_id']
+                updated_query = update_query_object(
+                    result, json_data, exceptions
+                )
 
-        db.session.add(updated_query)
-        db.session.commit()
+                db.session.add(updated_query)
+                db.session.commit()
 
     except Exception as e:
         return error_plant.unable_to_update(e)
@@ -158,7 +161,7 @@ def update_watering():
 
 
 @plant_bp.route("/plant/dew", methods=['PUT'])
-def update_dew():
+def update_dew( ):
     # TODO: encapsulate dew and watering update views, as they use the same
     #       logic
     """Updates existing Plant's dew in database.
@@ -167,34 +170,38 @@ def update_dew():
     """
 
     json_data = request.get_json()
-    plant_id = json_data['plant_id']
-    json_data['last_update'] = datetime.now().isoformat()
-    json_data['last_dew'] = datetime.now()
+    plant_ids = json_data['plant_ids']
+    json_data['last_update'] = datetime.now()
+    json_data['last_dew'] = datetime.now().isoformat()
+
+    if not plant_ids:
+        return error_plant.provide_parameters()
 
     try:
-        result = Plant.query.filter_by(id=plant_id).first()
-        if not result:
+        results = Plant.query.filter(Plant.id.in_(plant_ids)).all()
+        if not results:
             return error_plant.not_exists()
         else:
-            current_time = datetime.timestamp(json_data['last_dew'])
-            if result.dews is None:
-                json_data['dews'] = json.dumps({
-                    'dews': [
-                        current_time
-                    ]
-                })
-            else:
-                dews = json.loads(result.dews)
-                dews['dews'].append(current_time)
-                json_data['dews'] = json.dumps(dews)
+            for result in results:
+                current_time = json_data['last_dew']
+                if result.dews is None:
+                    json_data['dews'] = json.dumps({
+                        'dews': [
+                            current_time
+                        ]
+                    })
+                else:
+                    dews = json.loads(result.dews)
+                    dews['dews'].append(current_time)
+                    json_data['dews'] = json.dumps(dews)
 
-            exceptions = ['id', 'book_id']
-            updated_query = update_query_object(
-                result, json_data, exceptions
-            )
+                exceptions = ['id', 'book_id']
+                updated_query = update_query_object(
+                    result, json_data, exceptions
+                )
 
-        db.session.add(updated_query)
-        db.session.commit()
+                db.session.add(updated_query)
+                db.session.commit()
 
     except Exception as e:
         return error_plant.unable_to_update(e)
@@ -208,7 +215,7 @@ def update_dew():
 
 
 @plant_bp.route("/plant/update_book", methods=['PUT'])
-def update_plants_book():
+def update_plants_book( ):
     """Updates existing Plant's book_id in database.
 
     # request body args: book_id, plant_id

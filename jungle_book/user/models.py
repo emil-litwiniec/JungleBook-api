@@ -2,7 +2,6 @@ from jungle_book.db import db
 from sqlalchemy.ext.hybrid import hybrid_property
 from . import bcrypt
 
-
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     first_name = db.Column(db.String(40))
@@ -16,9 +15,7 @@ class User(db.Model):
     _password = db.Column(db.String(128))
 
     books = db.relationship('Book', backref="User", lazy=True)
-
-    plants = db.relationship('Book', backref="Plant", lazy=True)
-
+    
     @hybrid_property
     def password(self):
         return self._password
@@ -44,7 +41,6 @@ class User(db.Model):
             'settings': self.settings,
             'avatar_image': self.avatar_image,
             'books': [book.serialize for book in self.books],
-            'plants': [plant.serialize for plant in self.plants]
         }
 
     def __repr__(self):
