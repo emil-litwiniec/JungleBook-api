@@ -10,7 +10,6 @@ class User(db.Model):
     created_at = db.Column(db.DateTime(timezone=False))
     last_update = db.Column(db.DateTime(timezone=False))
     settings = db.Column(db.JSON)
-    # TODO -> set path to default avatar picture
     avatar_image = db.Column(db.String())
     _password = db.Column(db.String(128))
 

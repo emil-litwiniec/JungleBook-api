@@ -4,10 +4,9 @@ from flask import Flask
 from jungle_book.auth.views import auth_bp, oauth
 from jungle_book.book.views import book_bp
 from jungle_book.plant.views import plant_bp
-
+from jungle_book.storage.views import storage_bp
 from jungle_book.user.views import user_bp
 
-from jungle_book.fs.views import files_bp
 from jungle_book.encyclopedia.views import encyclopedia_bp
 from config import ProductionConfig, DevelopmentConfig
 from jungle_book.db import db
@@ -42,7 +41,7 @@ def setup_app(app):
     app.register_blueprint(book_bp, url_prefix=url_prefix)
     app.register_blueprint(encyclopedia_bp, url_prefix=url_prefix)
     app.register_blueprint(plant_bp, url_prefix=url_prefix)
-    app.register_blueprint(files_bp, url_prefix=url_prefix)
+    app.register_blueprint(storage_bp, url_prefix=url_prefix)
     CORS(app)
 
 

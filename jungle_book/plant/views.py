@@ -15,7 +15,7 @@ plant_bp = Blueprint('plant_bp', __name__)
 
 
 @plant_bp.route('/plant', methods=['POST'])
-def create_plant( ):
+def create_plant():
     """Creates new Plant in db
     """
 
@@ -74,7 +74,7 @@ def delete_plant(plant_id):
 
 
 @plant_bp.route("/plant", methods=['PUT'])
-def update_plant( ):
+def update_plant():
     """Updates existing Plant in database.
 
     # request body args: plant_id, name, description, avatar_image
@@ -139,7 +139,8 @@ def plant_update_action(action):
                 else:
                     action_property = json.loads(last_action)
                     action_property['{}s'.format(action)].append(current_time)
-                    json_data['{}s'.format(action)] = json.dumps(action_property)
+                    json_data['{}s'.format(action)] = json.dumps(
+                        action_property)
 
                 exceptions = ['id', 'book_id']
                 updated_query = update_query_object(
@@ -161,7 +162,7 @@ def plant_update_action(action):
 
 
 @plant_bp.route("/plant/update_book", methods=['PUT'])
-def update_plants_book( ):
+def update_plants_book():
     """Updates existing Plant's book_id in database.
 
     # request body args: book_id, plant_id

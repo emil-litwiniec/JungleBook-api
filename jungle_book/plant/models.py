@@ -1,6 +1,7 @@
 from jungle_book.db import db
 from datetime import datetime
 
+
 class Plant(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     name = db.Column(db.String(60))
@@ -11,6 +12,7 @@ class Plant(db.Model):
     plant_info = db.Column(db.JSON)
     last_watering = db.Column(db.DateTime(timezone=False))
     waterings = db.Column(db.JSON)
+    water_interval = db.Column(db.Integer)
     last_dew = db.Column(db.DateTime(timezone=False))
     dews = db.Column(db.JSON)
     created_at = db.Column(db.DateTime(timezone=False))
@@ -31,7 +33,9 @@ class Plant(db.Model):
             'plant_info': self.plant_info,
             'last_watering': self.last_watering,
             'days_since_last_watering': self.days_since_last_time(self.last_watering),
+            'should_be_watered': self.should_be_watered,
             'waterings': self.waterings,
+            'water_interval': self.water_interval,
             'last_dew': self.last_dew,
             'days_since_last_dew': self.days_since_last_time(self.last_dew),
             'dews': self.dews,
@@ -47,6 +51,18 @@ class Plant(db.Model):
         now = datetime.now()
         difference = now - date
         return difference.days
+
+    @property
+    def should_be_watered(self):
+        days_since_last_watering = self.days_since_last_time(
+            self.last_watering)
+        if not self.water_interval or not days_since_last_watering:
+            return False
+
+        if days_since_last_watering >= self.water_interval:
+            return True
+
+        return False
 
     def __repr__(self):
         return '<Plant %r>' % self.id
