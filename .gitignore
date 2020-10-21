@@ -7,3 +7,4 @@ instance
 __pycache__
 *.pyc
 static/files/*
+.idea
