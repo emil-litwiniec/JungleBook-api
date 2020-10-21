@@ -8,10 +8,6 @@ JungleBook web client app: https://github.com/EmilTheSadCat/JungleBook-web-clien
 
 You can easily check status of your plants. See if they need water.
 
-## Features
-
--   SQL
-
 ## Tech Stack
 
 -   Python 3.8
@@ -65,7 +61,7 @@ export AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY>
 
 ## Links
 
-**Note:** _Project is still in development. There is no preview yet._
+-   API host address: https://junglebook-api.herokuapp.com/api
 
 </br>
 

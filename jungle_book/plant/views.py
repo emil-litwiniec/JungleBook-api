@@ -129,10 +129,10 @@ def plant_update_action(action):
             for result in results:
                 current_time = json_data['last_{}'.format(action)]
                 last_action = getattr(result, '{}s'.format(action))
-
                 if last_action is None:
+                    print('{}s'.format(action))
                     json_data['{}s'.format(action)] = json.dumps({
-                        ['{}s'.format(action)]: [
+                        '{}s'.format(action): [
                             current_time
                         ]
                     })
@@ -151,6 +151,7 @@ def plant_update_action(action):
                 db.session.commit()
 
     except Exception as e:
+        print(e)
         return error_plant.unable_to_update(e)
 
     res_data = jsonify({

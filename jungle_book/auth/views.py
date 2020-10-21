@@ -27,6 +27,7 @@ def authorize_google( ):
     #     token_email = request.json['email']
     # except Exception:
     #     return ErrorHandler.provide_parameters()
+    
     # --- these will run in prodcution --- #
 
     token = oauth.google.authorize_access_token()
